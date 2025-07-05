@@ -12,7 +12,7 @@ Hello World
 
 [DELETE] http://localhost:3000/users/:id > Return status user deleted (200)
 
-[PUT] http://localhost:3000/users/:id
+[PUT] http://localhost:3000/users/:id > Return the user updated (200)
 
 
 
