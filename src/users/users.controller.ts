@@ -1,4 +1,5 @@
 import { Controller, Get, Param, Post, Body, Delete, Put, NotFoundException, UnprocessableEntityException, ForbiddenException } from '@nestjs/common';
+import { CreateUserDto } from './user.dto';
 
 interface User {
   id: string;
@@ -44,7 +45,7 @@ export class UsersController {
   }
 
   @Post()
-  createUser(@Body() body: User) {
+  createUser(@Body() body: CreateUserDto) {
     const newUser = {
       ...body,
       id: `${new Date().getTime()}`,
