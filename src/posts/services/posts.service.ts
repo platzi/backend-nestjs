@@ -14,7 +14,7 @@ export class PostsService {
 
   async findAll() {
     const posts = await this.postsRepository.find({
-      relations: ['user.profile'],
+      relations: ['user.profile', 'categories'],
     });
     return posts;
   }
@@ -22,7 +22,7 @@ export class PostsService {
   async findOne(id: number) {
     const post = await this.postsRepository.findOne({
       where: { id },
-      relations: ['user.profile'],
+      relations: ['user.profile', 'categories'],
     });
     if (!post) {
       throw new NotFoundException(`Post with id ${id} not found`);
@@ -35,6 +35,7 @@ export class PostsService {
       const newPost = await this.postsRepository.save({
         ...body,
         user: { id: body.userId },
+        categories: body.categoryIds?.map((id) => ({ id })),
       });
       return this.findOne(newPost.id);
     } catch {
@@ -60,5 +61,13 @@ export class PostsService {
     } catch {
       throw new BadRequestException('Error deleting post');
     }
+  }
+
+  async getPostsByCategoryId(categoryId: number) {
+    const posts = await this.postsRepository.find({
+      where: { categories: { id: categoryId } },
+      relations: ['user.profile'],
+    });
+    return posts;
   }
 }
