@@ -22,6 +22,23 @@ docker compose down # Stop the services
 docker compose down -v # Stop the services and remove the volumes
 docker compose ps # List the services
 
+# Prompt
 
+Basado en @posts.service.ts y en @posts.controller.ts crea el CRUD para las categorias dentro del modulo @posts.module.ts esta es la estructura:
+
+.
+├── controllers
+│   ├── posts.controller.spec.ts
+│   └── posts.controller.ts
+├── dto
+│   ├── create-post.dto.ts
+│   └── update-post.dto.ts
+├── entities
+│   ├── category.entity.ts
+│   └── post.entity.ts
+├── posts.module.ts
+└── services
+    ├── posts.service.spec.ts
+    └── posts.service.ts
 
 
