@@ -1,15 +1,17 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { CreatePostDto } from './../dto/create-post.dto';
 import { UpdatePostDto } from './../dto/update-post.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './../entities/post.entity';
+import { OpenaiService } from '../../ai/services/openai.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
+    private openaiService: OpenaiService,
   ) {}
 
   async findAll() {
@@ -69,5 +71,24 @@ export class PostsService {
       relations: ['user.profile'],
     });
     return posts;
+  }
+
+  async publish(id: number, userId: number) {
+    const post = await this.findOne(id);
+    if (post.user.id !== userId) {
+      throw new ForbiddenException('You are not allowed to publish this post');
+    }
+    if (!post.content || !post.title || post.categories.length === 0) {
+      throw new BadRequestException('Post content, title and at least one category are required');
+    }
+    const summary = await this.openaiService.generateSummary(post.content);
+    const image = await this.openaiService.generateImage(summary);
+    const changes = this.postsRepository.merge(post, {
+      isDraft: false,
+      summary,
+      coverImage: image,
+    });
+    const updatedPost = await this.postsRepository.save(changes);
+    return this.findOne(updatedPost.id);
   }
 }
